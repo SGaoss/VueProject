@@ -61,6 +61,7 @@ export default {
                 })
               } else {
                 //   路由跳转
+                localStorage.setItem('itcast_pro_token', result.data.data.token)
                 this.$router.push({ name: 'Home' })
               }
             })
