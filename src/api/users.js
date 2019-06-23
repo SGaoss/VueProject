@@ -31,3 +31,10 @@ export const addUser = (data) => {
     data
   })
 }
+export const editUser = (data) => {
+  return axios({
+    method: 'put',
+    url: `users/${data.id}`,
+    data
+  })
+}

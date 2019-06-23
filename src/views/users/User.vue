@@ -37,6 +37,24 @@
         <el-button type="primary" @click="add">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑用户对话框 -->
+    <el-dialog title="编辑用户" :visible.sync="editDialogFormVisible">
+      <el-form ref='editForm' :model="editForm" :rules='rules' :label-width="'120px'">
+        <el-form-item label="用户名">
+          <el-input v-model="editForm.username" auto-complete="off" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop='email'>
+          <el-input v-model="editForm.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop='mobile'>
+          <el-input v-model="editForm.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editDialogFormVisible = false;$refs.editForm.resetFields()">取 消</el-button>
+        <el-button type="primary" @click="edit">确 定</el-button>
+      </div>
+    </el-dialog>
     <el-table :data="userList" border style="width: 100%;margin-top:15px">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="username" label="姓名" width="180"></el-table-column>
@@ -50,7 +68,7 @@
       <el-table-column label="操作">
         <!-- 插槽：匿名插槽，具名插槽，数据插槽 -->
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top" >
             <el-button type="info" icon="el-icon-edit" @click="handleEdit(scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="分配角色" placement="top">
@@ -74,7 +92,7 @@
   </div>
 </template>
 <script>
-import { getAllList, addUser } from '@/api/users.js'
+import { getAllList, addUser, editUser } from '@/api/users.js'
 export default {
   data () {
     return {
@@ -92,6 +110,13 @@ export default {
       addForm: {
         username: '',
         password: '',
+        email: '',
+        mobile: ''
+      },
+      editDialogFormVisible: false,
+      editForm: {
+        id: '',
+        username: '',
         email: '',
         mobile: ''
       },
@@ -123,6 +148,43 @@ export default {
     }
   },
   methods: {
+    handleEdit (obj) {
+      this.editDialogFormVisible = true
+      this.editForm.id = obj.id
+      this.editForm.username = obj.username
+      this.editForm.email = obj.email
+      this.editForm.mobile = obj.mobile
+    },
+    edit () {
+      this.$refs.editForm.validate(valid => {
+        if (valid) {
+          editUser(this.editForm).then(res => {
+            // 一定不要靠猜，而是打印出数据分析数据内容和结构
+            console.log(res)
+            if (res.data.meta.status === 200) {
+              this.$message({
+                type: 'success',
+                message: res.data.meta.msg
+              })
+              // 数据刷新
+              this.editDialogFormVisible = false
+              // 表单元素的数据重置
+              this.$refs.editForm.resetFields()
+              this.init()
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.data.meta.msg
+              })
+            }
+          }).catch(() => {
+            console.log('err')
+          })
+        } else {
+          return false
+        }
+      })
+    },
     add () {
       this.$refs.addForm.validate(valid => {
         // 如果为true
