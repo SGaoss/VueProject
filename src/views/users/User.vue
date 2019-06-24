@@ -160,7 +160,7 @@ export default {
         if (valid) {
           editUser(this.editForm).then(res => {
             // 一定不要靠猜，而是打印出数据分析数据内容和结构
-            console.log(res)
+            // console.log(res)
             if (res.data.meta.status === 200) {
               this.$message({
                 type: 'success',
@@ -230,9 +230,9 @@ export default {
       this.pagenum = val
       this.init()
     },
-    handleEdit (obj) {
-      console.log(obj)
-    },
+    // handleEdit (obj) {
+    //   console.log(obj)
+    // },
     init () {
       getAllList({
         query: this.query,
