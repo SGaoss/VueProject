@@ -58,7 +58,7 @@
     <el-table :data="userList" border style="width: 100%;margin-top:15px">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="username" label="姓名" width="180"></el-table-column>
-      <el-table-column prop="eamil" label="邮箱" width="180"></el-table-column>
+      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
       <el-table-column prop="mobile" label="电话" width="300"></el-table-column>
       <el-table-column label="状态" width="120">
         <template slot-scope="scope">
@@ -75,7 +75,7 @@
             <el-button type="success" icon="el-icon-share"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button type="warning" icon="el-icon-delete"></el-button>
+            <el-button type="warning" icon="el-icon-delete" @click="DelTips(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -92,7 +92,7 @@
   </div>
 </template>
 <script>
-import { getAllList, addUser, editUser } from '@/api/users.js'
+import { getAllList, addUser, editUser, deleteUser } from '@/api/users.js'
 export default {
   data () {
     return {
@@ -148,6 +148,35 @@ export default {
     }
   },
   methods: {
+    DelTips (id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteUser(id)
+          .then(res => {
+            if (res.data.meta.status === 200) {
+              this.$message({
+                type: 'success',
+                message: '删除成功！'
+              })
+              this.init()
+            }
+          })
+          .catch(() => {
+            this.$message({
+              type: 'error',
+              message: '删除失败...'
+            })
+          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
     handleEdit (obj) {
       this.editDialogFormVisible = true
       this.editForm.id = obj.id
@@ -235,7 +264,7 @@ export default {
     // },
     init () {
       getAllList({
-        query: this.query,
+        query: this.userKey,
         pagenum: this.pagenum,
         pagesize: this.pagesize
       })

@@ -38,3 +38,9 @@ export const editUser = (data) => {
     data
   })
 }
+export const deleteUser = (id) => {
+  return axios({
+    method: 'delete',
+    url: `users/${id}`
+  })
+}
